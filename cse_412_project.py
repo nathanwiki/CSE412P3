@@ -9,43 +9,43 @@ def create_database(database_name):
 # Function to create table
 def create_table():
     mycursor = mydb.cursor()
-    mycursor.execute('''CREATE TABLE AppUser (
+    mycursor.execute('''CREATE TABLE IF NOT EXISTS AppUser (
                     Username VARCHAR(255) NOT NULL,
                     Email VARCHAR(255) UNIQUE NOT NULL,
                     Password VARCHAR(255) NOT NULL,
                     FitnessLevel INT NOT NULL
                     );''')
-    mycursor.execute('''CREATE TABLE Equipment (
+    mycursor.execute('''CREATE TABLE IF NOT EXISTS Equipment (
                     EquipmentID INT PRIMARY KEY,
                     EquipmentName VARCHAR(255) NOT NULL
                     );''')
-    mycursor.execute('''CREATE TABLE Workout (
+    mycursor.execute('''CREATE TABLE IF NOT EXISTS Workout (
                     WorkoutID INT PRIMARY KEY,
                     WorkoutName VARCHAR(255) NOT NULL,
                     Duration INT NOT NULL,
                     DifficultyLevel INT NOT NULL
                     );''')
-    mycursor.execute('''CREATE TABLE Exercise (
+    mycursor.execute('''CREATE TABLE IF NOT EXISTS Exercise (
                     ExerciseID INT PRIMARY KEY,
                     ExerciseName VARCHAR(255) NOT NULL,
                     Duration INT NOT NULL,
                     Repetitions INT NOT NULL
                     );''')
-    mycursor.execute('''CREATE TABLE WorkoutPlan (
+    mycursor.execute('''CREATE TABLE IF NOT EXISTS WorkoutPlan (
                     PlanID INT PRIMARY KEY,
                     UserID INT,
                     WorkoutID INT,
                     FOREIGN KEY (UserID) REFERENCES AppUser(UserID),
                     FOREIGN KEY (WorkoutID) REFERENCES Workout(WorkoutID)
                     );''')
-    mycursor.execute('''CREATE TABLE WorkoutExercise (
+    mycursor.execute('''CREATE TABLE IF NOT EXISTS WorkoutExercise (
                     WorkoutExerciseID INT PRIMARY KEY,
                     WorkoutID INT,
                     ExerciseID INT,
                     FOREIGN KEY (WorkoutID) REFERENCES Workout(WorkoutID),
                     FOREIGN KEY (ExerciseID) REFERENCES Exercise(ExerciseID)
                     );''')
-    mycursor.execute('''CREATE TABLE EquipmentExercise (
+    mycursor.execute('''CREATE TABLE IF NOT EXISTS EquipmentExercise (
                     EquipmentExerciseID INT PRIMARY KEY,
                     EquipmentID INT,
                     ExerciseID INT,
@@ -60,10 +60,10 @@ def add_user():
     try:
         cursor = mydb.cursor()
         # Get user input
-        username = "test"#input("Enter username: ")
-        email = "test"#input("Enter email: ")
-        password = "test"#input("Enter password: ")
-        fitness_level = 1 #int(input("Enter fitness level (1-5): "))
+        username = input("Enter username: ")
+        email = input("Enter email: ")
+        password = input("Enter password: ")
+        fitness_level = int(input("Enter fitness level (1-5): "))
         # Insert data into the table
         sql = '''INSERT INTO AppUser (Username, Email, Password, FitnessLevel) VALUES (%s, %s, %s, %s)'''
         val = (username, email, password, fitness_level)
@@ -290,10 +290,10 @@ mydb = mysql.connector.connect(
 
 if mydb:
     try:
-        #database_name = input("Enter database name: ")
-        #create_database(database_name, mydb)
+        database_name = input("Enter database name: ")
+        create_database(database_name)
         mydb.database = "412DB"
-        #create_table(mydb)
+        create_table()
         add_user()
         action = input('''\nWhat would you like to do?
                            1: Add equipment
@@ -309,10 +309,13 @@ if mydb:
                            0: Quit\n''')
         while(action != '0'):
             if(action == '1'):
+                view_equipment()
                 add_equipment()
             elif(action == '2'): 
+                view_workout()
                 add_workout()
             elif(action == '3'): 
+                view_exercise()
                 add_exercise()
             elif(action == '4'): 
                 link_equipment_exercise()
